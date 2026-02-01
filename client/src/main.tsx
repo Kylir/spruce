@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { CellValue, GameStatus, Player } from './types'
 import { isWinningMove } from './utils/gameLogic'
+import { saveGameResult } from './utils/api'
 import { GameControls } from './Components/GameControls'
 import { Board } from './Components/Board'
 
@@ -16,6 +17,7 @@ export const Main = () => {
   const [gameStatus, setGameStatus] = useState<GameStatus>('in_progress')
   const [gridSize, setGridSize] = useState<number>(3)
   const [winCondition, setWinCondition] = useState<number>(3)
+  const [statusMessage, setStatusMessage] = useState<string>('Player: X')
 
   const handleCellClick = (rowIndex: number, colIndex: number) => {
     // Do nothing if no game in progress or if the cell is not empty
@@ -32,17 +34,27 @@ export const Main = () => {
     // Detect wins
     if (isWinningMove(currentPlayer, newBoard, rowIndex, colIndex, winCondition)) {
       setGameStatus('victory')
+      setStatusMessage(`Game ended: ${currentPlayer} wins! Saving your game...`)
+      saveGameResult(currentPlayer, gridSize, winCondition)
+        .then(() => setStatusMessage(`Game ended: ${currentPlayer} wins! Game saved!`))
+        .catch(() => setStatusMessage(`Game ended: ${currentPlayer} wins! Oops... the save failed.`))
       return
     }
 
     // Detect draws
     if (turnNumber === gridSize * gridSize - 1) {
       setGameStatus('draw')
+      setStatusMessage("Game ended. It's a draw! Saving your game...")
+      saveGameResult('draw', gridSize, winCondition)
+        .then(() => setStatusMessage("Game ended. It's a draw! Game saved!"))
+        .catch(() => setStatusMessage("Game ended. It's a draw! Oops... the save failed."))
       return
     }
 
-    setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X')
+    const nextPlayer = currentPlayer === 'X' ? 'O' : 'X'
+    setCurrentPlayer(nextPlayer)
     setTurnNumber(turnNumber + 1)
+    setStatusMessage(`Player: ${nextPlayer}`)
   }
 
   const resetGame = () => {
@@ -50,13 +62,7 @@ export const Main = () => {
     setCurrentPlayer('X')
     setTurnNumber(0)
     setGameStatus('in_progress')
-  }
-
-  let statusMessage = `Player: ${currentPlayer}`
-  if (gameStatus === 'draw') {
-    statusMessage = "Game ended. It's a draw!"
-  } else if (gameStatus === 'victory') {
-    statusMessage = `Game ended: ${currentPlayer} wins!`
+    setStatusMessage('Player: X')
   }
 
   return (
