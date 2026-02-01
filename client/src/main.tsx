@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { CellValue, GameStatus } from './types'
+import { CellValue, GameStatus, Player } from './types'
+import { isWinningMove } from './utils/gameLogic'
 
 
 export const Main = () => {
@@ -24,8 +25,14 @@ export const Main = () => {
     )
     setBoard(newBoard)
 
+    // Detect wins
+    if (isWinningMove(currentPlayer, newBoard, rowIndex, colIndex)) {
+      setGameStatus('victory')
+      return
+    }
+
     // Detect draws
-    if (turnNumber + 1 === 9) {
+    if (turnNumber === 8) {
       setGameStatus('draw')
       return
     }
@@ -34,14 +41,32 @@ export const Main = () => {
     setTurnNumber(turnNumber + 1)
   }
 
+  const resetGame = () => {
+    setBoard([['', '', ''], ['', '', ''], ['', '', '']])
+    setCurrentPlayer('X')
+    setTurnNumber(0)
+    setGameStatus('in_progress')
+  }
+
   let statusMessage = `Player: ${currentPlayer}`
   if (gameStatus === 'draw') {
     statusMessage = "Game ended. It's a draw!"
+  } else if (gameStatus === 'victory') {
+    statusMessage = `Game ended: ${currentPlayer} wins!`
   }
 
   return <div className='flex flex-col mt-10 items-center gap-10'>
     <div className='font-bold text-2xl'>Tic Tac Toe</div>
+    
+    <button
+      className='px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700'
+      onClick={resetGame}
+    >
+      New Game
+    </button>
+    
     <div>{statusMessage}</div>
+    
     <div className='flex flex-col gap-1'>
       {board.map((row, rowIndex) => <div className='flex gap-1'>
         {row.map((cell, colIndex) => <div
