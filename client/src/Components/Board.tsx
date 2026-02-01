@@ -1,5 +1,5 @@
 import React from 'react'
-import { CellValue } from './types'
+import { CellValue } from '../types'
 
 interface BoardProps {
   board: CellValue[][]

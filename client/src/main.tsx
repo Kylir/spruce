@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { CellValue, GameStatus, Player } from './types'
 import { isWinningMove } from './utils/gameLogic'
-import { GameControls } from './GameControls'
-import { Board } from './Board'
+import { GameControls } from './Components/GameControls'
+import { Board } from './Components/Board'
 
 
 const createBoard = (size: number): CellValue[][] => {
