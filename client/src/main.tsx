@@ -1,20 +1,24 @@
 import React, { useState } from 'react'
 import { CellValue, GameStatus, Player } from './types'
 import { isWinningMove } from './utils/gameLogic'
+import { GameControls } from './GameControls'
+import { Board } from './Board'
 
+
+const createBoard = (size: number): CellValue[][] => {
+  return Array(size).fill(null).map(() => Array(size).fill(''))
+}
 
 export const Main = () => {
-  const [board, setBoard] = useState<CellValue[][]>([
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', '']
-  ])
-  const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X')
+  const [board, setBoard] = useState<CellValue[][]>(createBoard(3))
+  const [currentPlayer, setCurrentPlayer] = useState<Player>('X')
   const [turnNumber, setTurnNumber] = useState<number>(0)
   const [gameStatus, setGameStatus] = useState<GameStatus>('in_progress')
+  const [gridSize, setGridSize] = useState<number>(3)
+  const [winCondition, setWinCondition] = useState<number>(3)
 
   const handleCellClick = (rowIndex: number, colIndex: number) => {
-    // Do nothing if no game in progress or if the cell is not empty 
+    // Do nothing if no game in progress or if the cell is not empty
     if (gameStatus !== 'in_progress') return
     if (board[rowIndex][colIndex] !== '') return
 
@@ -26,13 +30,13 @@ export const Main = () => {
     setBoard(newBoard)
 
     // Detect wins
-    if (isWinningMove(currentPlayer, newBoard, rowIndex, colIndex)) {
+    if (isWinningMove(currentPlayer, newBoard, rowIndex, colIndex, winCondition)) {
       setGameStatus('victory')
       return
     }
 
     // Detect draws
-    if (turnNumber === 8) {
+    if (turnNumber === gridSize * gridSize - 1) {
       setGameStatus('draw')
       return
     }
@@ -42,7 +46,7 @@ export const Main = () => {
   }
 
   const resetGame = () => {
-    setBoard([['', '', ''], ['', '', ''], ['', '', '']])
+    setBoard(createBoard(gridSize))
     setCurrentPlayer('X')
     setTurnNumber(0)
     setGameStatus('in_progress')
@@ -55,27 +59,21 @@ export const Main = () => {
     statusMessage = `Game ended: ${currentPlayer} wins!`
   }
 
-  return <div className='flex flex-col mt-10 items-center gap-10'>
-    <div className='font-bold text-2xl'>Tic Tac Toe</div>
-    
-    <button
-      className='px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700'
-      onClick={resetGame}
-    >
-      New Game
-    </button>
-    
-    <div>{statusMessage}</div>
-    
-    <div className='flex flex-col gap-1'>
-      {board.map((row, rowIndex) => <div className='flex gap-1'>
-        {row.map((cell, colIndex) => <div
-          className='border-2 border-gray-900 w-10 h-10 cursor-pointer items-center justify-center text-2xl font-bold flex'
-          onClick={() => handleCellClick(rowIndex, colIndex)}
-        >
-          {cell}
-        </div>)}
-      </div>)}
+  return (
+    <div className='flex flex-col mt-10 items-center gap-10'>
+      <div className='font-bold text-2xl'>Tic Tac Toe</div>
+
+      <GameControls
+        gridSize={gridSize}
+        setGridSize={setGridSize}
+        winCondition={winCondition}
+        setWinCondition={setWinCondition}
+        onNewGame={resetGame}
+      />
+
+      <div>{statusMessage}</div>
+
+      <Board board={board} onCellClick={handleCellClick} />
     </div>
-  </div>
+  )
 }
