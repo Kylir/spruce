@@ -14,3 +14,14 @@ export const saveGameResult = async (
   })
   return response.json()
 }
+
+export interface Stats {
+  xWins: number
+  oWins: number
+  draws: number
+}
+
+export const getStats = async (): Promise<Stats> => {
+  const response = await fetch(`${API_URL}/stats`)
+  return response.json()
+}

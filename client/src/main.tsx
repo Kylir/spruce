@@ -4,6 +4,7 @@ import { isWinningMove } from './utils/gameLogic'
 import { saveGameResult } from './utils/api'
 import { GameControls } from './Components/GameControls'
 import { Board } from './Components/Board'
+import { Stats } from './Components/Stats'
 
 
 const createBoard = (size: number): CellValue[][] => {
@@ -18,6 +19,7 @@ export const Main = () => {
   const [gridSize, setGridSize] = useState<number>(3)
   const [winCondition, setWinCondition] = useState<number>(3)
   const [statusMessage, setStatusMessage] = useState<string>('Player: X')
+  const [statsRefresh, setStatsRefresh] = useState<number>(0)
 
   const handleCellClick = (rowIndex: number, colIndex: number) => {
     // Do nothing if no game in progress or if the cell is not empty
@@ -36,7 +38,10 @@ export const Main = () => {
       setGameStatus('victory')
       setStatusMessage(`Game ended: ${currentPlayer} wins! Saving your game...`)
       saveGameResult(currentPlayer, gridSize, winCondition)
-        .then(() => setStatusMessage(`Game ended: ${currentPlayer} wins! Game saved!`))
+        .then(() => {
+          setStatusMessage(`Game ended: ${currentPlayer} wins! Game saved!`)
+          setStatsRefresh(n => n + 1)
+        })
         .catch(() => setStatusMessage(`Game ended: ${currentPlayer} wins! Oops... the save failed.`))
       return
     }
@@ -46,7 +51,10 @@ export const Main = () => {
       setGameStatus('draw')
       setStatusMessage("Game ended. It's a draw! Saving your game...")
       saveGameResult('draw', gridSize, winCondition)
-        .then(() => setStatusMessage("Game ended. It's a draw! Game saved!"))
+        .then(() => {
+          setStatusMessage("Game ended. It's a draw! Game saved!")
+          setStatsRefresh(n => n + 1)
+        })
         .catch(() => setStatusMessage("Game ended. It's a draw! Oops... the save failed."))
       return
     }
@@ -80,6 +88,8 @@ export const Main = () => {
       <div>{statusMessage}</div>
 
       <Board board={board} onCellClick={handleCellClick} />
+
+      <Stats refreshTrigger={statsRefresh} />
     </div>
   )
 }

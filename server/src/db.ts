@@ -20,13 +20,17 @@ export const saveGame = (winner: string, boardSize: number, winCondition: number
 
 export const getStats = () => {
   const stmt = db.prepare(`
-    SELECT
-      winner,
-      COUNT(*) as count
+    SELECT winner, COUNT(*) as count
     FROM games
     GROUP BY winner
   `)
-  return stmt.all()
+  const rows = stmt.all() as { winner: string, count: number }[]
+
+  return {
+    xWins: rows.find(r => r.winner === 'X')?.count || 0,
+    oWins: rows.find(r => r.winner === 'O')?.count || 0,
+    draws: rows.find(r => r.winner === 'draw')?.count || 0
+  }
 }
 
 export const getAllGames = () => {
