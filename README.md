@@ -5,6 +5,8 @@ This is my solution to the game of Tic Tac Toe.
 It took me around 3 hours to implement on a busy Sunday.
 I used Claude Code all along.
 
+After completing each exercise, I created a git tag. For instance, using `git checkout exercise1` will set the repo at the end of the Exercise 1. 
+
 ## Problems
 ### Problem 1
 
