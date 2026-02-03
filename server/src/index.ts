@@ -9,7 +9,7 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Tic Tac Toe API' })
+  res.json({ message: 'Tic Tac Toe API is up and running.' })
 })
 
 app.post('/games', (req, res) => {

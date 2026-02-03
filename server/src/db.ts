@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3'
 
-const db = new Database('database/tictactoe.db')
+const db = new Database('tictactoe.db')
 
 // Initialize the database schema
 db.exec(`
@@ -26,6 +26,7 @@ export const getStats = () => {
   `)
   const rows = stmt.all() as { winner: string, count: number }[]
 
+  // return aggregated data
   return {
     xWins: rows.find(r => r.winner === 'X')?.count || 0,
     oWins: rows.find(r => r.winner === 'O')?.count || 0,
